@@ -1,0 +1,52 @@
+{
+  "name": "@hitsuji/core",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*"
+      ]
+    }
+  },
+  "keywords": [],
+  "author": "MMJ",
+  "license": "ISC",
+  "scripts": {
+    "generate-api": "orval -i api.yaml -o src/api/api-generated.ts -c react-query",
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "5.83.0",
+    "axios": "^1.10.0",
+    "bcrypt": "^5.1.1",
+    "react": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "5.83.0",
+    "@types/axios": "^0.14.4",
+    "@types/bcrypt": "^5.0.2",
+    "@types/react": "^19.1.8",
+    "typescript": "5.8.3"
+  },
+  "dependencies": {
+    "orval": "7.5.0"
+  }
+}

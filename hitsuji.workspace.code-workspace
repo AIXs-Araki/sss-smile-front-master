@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "pc-frontend"
+		},
+		{
+			"path": "core"
+		},
+		{
+			"path": "admin-frontend"
+		},
+		{
+			"path": "mobile-app"
+		}
+	],
+	"settings": {}
+}

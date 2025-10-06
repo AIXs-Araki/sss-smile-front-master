@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1010645908477",
+    "project_id": "sss-smile-dev-android",
+    "storage_bucket": "sss-smile-dev-android.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1010645908477:android:4dcea62908e22315553794",
+        "android_client_info": {
+          "package_name": "com.safety_sheep_smile.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxgLFxh8eNd2ZW5EBhHFFy1Is5p7u7gyg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

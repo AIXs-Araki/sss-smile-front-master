@@ -1,0 +1,5592 @@
+openapi: 3.1.0
+info:
+  title: SSS Web API
+  version: "1.0"
+  description: |
+    This is the Safety Sheep Sensor system Web API.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    GeneralResponse200:
+      type: object
+      properties:
+        Result:
+          type: boolean
+          description: 結果判定
+        Message:
+          type: string
+          description: 本文
+    GeneralError:
+      type: object
+      description: エラーレスポンス
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: エラーコード
+        message:
+          type: string
+          description: エラーメッセージ
+tags:
+  - name: loginsys
+    description: Log into the system
+  - name: loginmon
+    description: Log into the monitor application
+  - name: login
+    description: Log into the mobile application
+  - name: logoutsys
+    description: Log out of the system
+  - name: logoutmon
+    description: Log out of the monitor application
+  - name: logout
+    description: Log out of the mobile application
+  - name: corplist
+    description: Corporations list operations
+  - name: facility
+    description: Facility operations
+  - name: userlist
+    description: Users list operations
+  - name: alert
+    description: Alert operations
+  - name: clearalert
+    description: Alert clearing operations
+  - name: device
+    description: Device operations
+  - name: condition
+    description: Sensor gateway condition operations
+  - name: userdata
+    description: User data operations
+  - name: userdatafile
+    description: User data files operations
+  - name: userdatamatrix
+    description: User data matrix operations
+  - name: userdatamatrixsort
+    description: User data matrix sortings
+  - name: alertsetting
+    description: Alert settings operations
+  - name: stafflist
+    description: Staff list operations
+  - name: userinfo
+    description: User information operations
+  - name: choice
+    description: Get any choices
+  - name: roomlist
+    description: Rooms list operations
+  - name: groupname
+    description: Group name operations
+  - name: authcode
+    description: Authetication code operations
+  - name: authcodereq
+    description: Authetication code requests
+  - name: resetpwd
+    description: Reset password operations
+  - name: resetpwdreq
+    description: Reset password requests
+  - name: sending
+    description: Any intervals sending operations
+  - name: checkupdates
+    description: Check any updates operations
+  - name: pushnotifkey
+    description: Push notifications key operations
+  - name: getfacilitydata
+    description: Get facility data operations
+  - name: notifgroup
+    description: Notifications group operations
+x-tagGroups:
+  - name: SystemManage
+    tags:
+      - loginsys
+      - logoutsys
+      - corplist
+      - facility
+      - userlist
+      - alert
+      - device
+      - getfacilitydata
+  - name: MonitorApplication
+    tags:
+      - loginmon
+      - logoutmon
+      - condition
+      - userdatafile
+      - userdatamatrixsort
+      - alertsetting
+      - stafflist
+      - userinfo
+      - choice
+      - roomlist
+      - groupname
+      - authcodereq
+      - resetpwd
+  - name: SmartphoneApplication
+    tags:
+      - login
+      - logout
+      - authcode
+      - resetpwdreq
+      - pushnotifkey
+      - notifgroup
+  - name: ApplicationCommon
+    tags:
+      - clearalert
+      - userdata
+      - userdatamatrix
+  - name: Gateway
+    tags:
+      - sending
+      - checkupdates
+paths:
+  /systemmanage/login:
+    post:
+      tags:
+        - loginsys
+      summary: 【001.LoginSysMng】
+      operationId: login_manage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ID:
+                  type: string
+                  description: ログインID
+                PW:
+                  type: string
+                  description: ログインPW
+                EmployeeNumber:
+                  type: string
+                  description: 社員番号
+              required:
+                - ID
+                - PW
+                - EmployeeNumber
+      responses:
+        '200':
+          description: ログイン成功
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  ChallengeParameters:
+                    type: object
+                  AuthenticationResult:
+                    type: object
+                    properties:
+                      AccessToken:
+                        type: string
+                        description: アクセストークン
+                      ExpiresIn:
+                        type: integer
+                        example: 54000 
+                      TokenType:
+                        type: string
+                        example: Bearer 
+                      RefreshToken:
+                        type: string
+                      IdToken:
+                        type: string
+                      accountId:
+                        type: string
+                        format: uuid
+                  ResponseMetadata:
+                    type: object
+                    properties:
+                      RequestId:
+                        type: string
+                        format: uuid
+                      HTTPStatusCode:
+                        type: integer
+                        example: 200 
+                      HTTPHeaders:
+                        type: object
+                        properties:
+                          date:
+                            type: string
+                            example: Thu, 03 Jul 2025 02:39:17 GMT
+                          content-type:
+                            type: string
+                            example: application/x-amz-json-1.1
+                          content-length:
+                            type: integer
+                            example: 4039 
+                          connection:
+                            type: string
+                            example: keep-alive 
+                          x-amzn-requestid:
+                            type: string
+                            format: uuid
+                      RetryAttempts:
+                        type: integer
+                        example: 0
+                  CookieData:
+                    type: object
+                    properties:
+                      statement:
+                        type: string
+                      sign:
+                        type: string
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/logout:
+    post:
+      tags:
+        - logoutsys
+      summary: 【002.LogoutSysMng】
+      operationId: logout_manage
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+          description: アクセストークン
+      responses:
+        '200':
+          description: ログアウト成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/corplist:
+    get:
+      description: 法人一覧画面の表示データを取得する
+      tags:
+        - corplist
+      summary: 【003.GetCorpListSysMng】
+      operationId: get_corporations_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 法人一覧画面の表示データ
+                          title: 法人一覧画面の表示データ
+                          properties:
+                            CorpID:
+                              type: integer
+                              description: 法人ID（法人テーブルの主キーと一致）
+                            CorpName:
+                              type: string
+                              description: 『法人名』カラム表示データ
+                            Comment:
+                              type: string
+                              description: 『コメント』カラム表示データ
+                            UpdatedTime:
+                              type: string
+                              format: date-time
+                              description: 『更新日時』カラム表示データ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    post:
+      tags:
+        - corplist
+      summary: 【004.AddCorpListSysMng】
+      operationId: add_corporations_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                CorpName:
+                  type: string
+                  description: 『法人名』データ
+                Comment:
+                  type: string
+                  description: 『コメント』データ
+              required:
+                - CorpName
+                - Comment
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    description: 法人編集画面（施設管理画面）の表示データ
+                    title: 法人編集画面（施設管理画面）の表示データ
+                    properties:
+                      CorpID:
+                        type: integer
+                        description: 法人ID（法人テーブルの主キーと一致）
+                      CorpName:
+                        type: string
+                        description: 『法人名』データ
+                      Comment:
+                        type: string
+                        description: 『コメント』データ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    delete:
+      tags:
+        - corplist
+      summary: 【006.DelCorpListSysMng】
+      operationId: delete_corporations_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: CorpID
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 法人一覧画面の表示データ
+                          title: 法人一覧画面の表示データ
+                          properties:
+                            CorpID:
+                              type: integer
+                              description: 法人ID（法人テーブルの主キーと一致）
+                            CorpName:
+                              type: string
+                              description: 『法人名』カラム表示データ
+                            Comment:
+                              type: string
+                              description: 『コメント』カラム表示データ
+                            UpdatedTime:
+                              type: string
+                              format: date-time
+                              description: 『更新日時』カラム表示データ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/corplist/{cid}:
+    put:
+      tags:
+        - corplist
+      summary: 【005.EditCorpListSysMng】
+      operationId: edit_corporations_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                CorpName:
+                  type: string
+                  description: 『法人名』データ
+                Comment:
+                  type: string
+                  description: 『コメント』データ
+              required:
+                - CorpName
+                - Comment
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    description: 法人編集画面（施設管理画面）の表示データ
+                    title: 法人編集画面（施設管理画面）の表示データ
+                    properties:
+                      CorpID:
+                        type: integer
+                        description: 法人ID（法人テーブルの主キーと一致）
+                      CorpName:
+                        type: string
+                        description: 『法人名』データ
+                      Comment:
+                        type: string
+                        description: 『コメント』データ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/facilitylist/{cid}:
+    get:
+      description: 施設管理画面（法人編集画面）の表示データ
+      tags:
+        - facility
+      summary: 【007.GetFacilityListSysMng】
+      operationId: get_facilities_list_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 施設管理画面の表示データ
+                          title: 施設管理画面の表示データ
+                          properties:
+                            FacilityID:
+                              type: string
+                              description: 施設ID（施設テーブルの主キーと一致）＆『施設コード』カラム表示データ
+                            FacilityName:
+                              type: string
+                              description: 『施設名』カラム表示データ
+                            Comment:
+                              type: string
+                              description: 『コメント』カラム表示データ
+                            UpdatedTime:
+                              type: string
+                              format: date-time
+                              description: 『更新日時』カラム表示データ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    post:
+      tags:
+        - facility
+      summary: 【008.AddFacilityListSysMng】
+      operationId: add_facilities_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                FacilityName:
+                  type: string
+                  description: 『施設名』データ
+                Comment:
+                  type: string
+                  description: 『コメント』データ
+                MonitorAppMailAddress:
+                  type: string
+                  format: email
+                  description: 『モニタPCアプリ　メールアドレス』データ
+                MonitorAppAccount:
+                  type: string
+                  description: 『モニタPCアプリ　アカウント』データ
+                MonitorAppPassword:
+                  type: string
+                  format: password
+                  description: 『モニタPCアプリ　パスワード』データ
+                MobileApp:
+                  type: array
+                  items:
+                    type: object
+                    description: 『モバイルアプリ』データ
+                    title: 『モバイルアプリ』データ
+                    properties:
+                      Account: 
+                        type: string
+                        description: 『モバイルアプリ　アカウント』データ
+                      Password: 
+                        type: string
+                        format: password
+                        description: 『モバイルアプリ　パスワード』データ
+                      NotifGroup:
+                        type: integer
+                        minimum: 0
+                        maximum: 255
+                        description: アラートプッシュ通知を受け取るグループの設定、全部で8グループなので2^8=256通り、グループID=1を受け取るなら2^(1-1)=1、グループID=8を受け取るなら2^(8-1)=128、グループID=1と2を受け取るなら2^(1-1)+2^(2-1)=3、といった具合
+                    required:
+                      - Account
+                      - Password
+                SSSAPIAccount: 
+                  type: string
+                  description: 『安心ひつじAPI　アカウント』データ
+                SSSAPIPassword: 
+                  type: string
+                  format: password
+                  description: 『安心ひつじAPI　パスワード』データ
+                ExternalCollaboCareKarteAPIKey:
+                  type: string
+                  description: 『外部連携　CAREKARTE　APIキー』データ
+                ExternalCollaboCareKartePassword:
+                  type: string
+                  format: password
+                  description: 『外部連携　CAREKARTE　パスワード』データ
+                ExternalCollaboHonobonoLicenseKey:
+                  type: string
+                  description: 『外部連携　ほのぼの　ライセンスキー』データ
+                NurseCallMaker:
+                  type: string
+                  description: 『ナースコール連携　メーカー選択』データ
+                NurseCallMailAddress:
+                  type: string
+                  format: email
+                  description: 『ナースコール連携　岩通用メールアドレス』データ
+              required:
+                - FacilityName
+                - MonitorAppMailAddress
+                - MonitorAppAccount
+                - MonitorAppPassword
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                description: 新規施設登録の結果
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/facilitylist/{cid}/{fid}:
+    put:
+      tags:
+        - facility
+      summary: 【009.EditFacilityListSysMng】
+      operationId: edit_facilities_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                FacilityName:
+                  type: string
+                  description: 『施設名』データ
+                Comment:
+                  type: string
+                  description: 『コメント』データ
+                MonitorAppMailAddress:
+                  type: string
+                  format: email
+                  description: 『モニタPCアプリ　メールアドレス』データ
+                MonitorAppAccount:
+                  type: string
+                  description: 『モニタPCアプリ　アカウント』データ
+                MonitorAppPassword:
+                  type: string
+                  format: password
+                  description: 『モニタPCアプリ　パスワード』データ
+                MobileApp:
+                  type: array
+                  items:
+                    type: object
+                    description: 『モバイルアプリ』データ
+                    title: 『モバイルアプリ』データ
+                    properties:
+                      Account: 
+                        type: string
+                        description: 『モバイルアプリ　アカウント』データ
+                      Password: 
+                        type: string
+                        format: password
+                        description: 『モバイルアプリ　パスワード』データ
+                    required:
+                      - Account
+                      - Password
+                SSSAPIAccount: 
+                  type: string
+                  description: 『安心ひつじAPI　アカウント』データ
+                SSSAPIPassword: 
+                  type: string
+                  format: password
+                  description: 『安心ひつじAPI　パスワード』データ
+                ExternalCollaboCareKarteAPIKey:
+                  type: string
+                  description: 『外部連携　CAREKARTE　APIキー』データ
+                ExternalCollaboCareKartePassword:
+                  type: string
+                  format: password
+                  description: 『外部連携　CAREKARTE　パスワード』データ
+                ExternalCollaboHonobonoLicenseKey:
+                  type: string
+                  description: 『外部連携　ほのぼの　ライセンスキー』データ
+                NurseCallMaker:
+                  type: string
+                  description: 『ナースコール連携　メーカー選択』データ
+                NurseCallMailAddress:
+                  type: string
+                  format: email
+                  description: 『ナースコール連携　岩通用メールアドレス』データ
+              required:
+                - FacilityName
+                - MonitorAppMailAddress
+                - MonitorAppAccount
+                - MonitorAppPassword
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                description: 施設情報編集の結果
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    get:
+      tags:
+        - getfacilitydata
+      summary: 【062.GetFacilityDataSysMng】
+      operationId: get_facilities_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    description: 登録済みの施設情報を取得
+                    title: 登録済みの施設情報を取得
+                    properties:
+                      FacilityName:
+                        type: string
+                        description: 『施設名』データ
+                      Comment:
+                        type: string
+                        description: 『コメント』データ
+                      MonitorAppMailAddress:
+                        type: string
+                        format: email
+                        description: 『モニタPCアプリ　メールアドレス』データ
+                      MonitorAppAccount:
+                        type: string
+                        description: 『モニタPCアプリ　アカウント』データ
+                      MonitorAppPassword:
+                        type: string
+                        format: password
+                        description: 『モニタPCアプリ　パスワード』データ
+                      MobileApp:
+                        type: array
+                        items:
+                          type: object
+                          description: 『モバイルアプリ』データ
+                          title: 『モバイルアプリ』データ
+                          properties:
+                            Account: 
+                              type: string
+                              description: 『モバイルアプリ　アカウント』データ
+                            Password: 
+                              type: string
+                              format: password
+                              description: 『モバイルアプリ　パスワード』データ
+                          required:
+                            - Account
+                            - Password
+                      SSSAPIAccount: 
+                        type: string
+                        description: 『安心ひつじAPI　アカウント』データ
+                      SSSAPIPassword: 
+                        type: string
+                        format: password
+                        description: 『安心ひつじAPI　パスワード』データ
+                      ExternalCollaboCareKarteAPIKey:
+                        type: string
+                        description: 『外部連携　CAREKARTE　APIキー』データ
+                      ExternalCollaboCareKartePassword:
+                        type: string
+                        format: password
+                        description: 『外部連携　CAREKARTE　パスワード』データ
+                      ExternalCollaboHonobonoLicenseKey:
+                        type: string
+                        description: 『外部連携　ほのぼの　ライセンスキー』データ
+                      NurseCallMaker:
+                        type: string
+                        description: 『ナースコール連携　メーカー選択』データ
+                      NurseCallMailAddress:
+                        type: string
+                        format: email
+                        description: 『ナースコール連携　岩通用メールアドレス』データ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    delete:
+      tags:
+        - facility
+      summary: 【010.DelFacilityListSysMng】
+      operationId: delete_facilities_list_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 施設管理画面の表示データ
+                          title: 施設管理画面の表示データ
+                          properties:
+                            FacilityID:
+                              type: string
+                              description: 施設ID（施設テーブルの主キーと一致）＆『施設コード』カラム表示データ
+                            FacilityName:
+                              type: string
+                              description: 『施設名』カラム表示データ
+                            Comment:
+                              type: string
+                              description: 『コメント』カラム表示データ
+                            UpdatedTime:
+                              type: string
+                              format: date-time
+                              description: 『更新日時』カラム表示データ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/userlistfile/{cid}/{fid}:
+    get:
+      tags:
+        - userlist
+      summary: 【011.GetUserListFileSysMng】
+      operationId: get_user_list_csv_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 施設利用者の情報をCSV一括出力
+                          title: 施設利用者の情報をCSV一括出力
+                          properties:
+                            UserID:
+                              type: string
+                              description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                            UserName:
+                              type: string
+                              description: 利用者の氏名
+                            UserNameKana:
+                              type: string
+                              description: 利用者氏名のふりがな
+                            Gender: 
+                              type: string
+                              description: 利用者の性別（男/女）
+                            BirthYear: 
+                              type: integer
+                              minimum: 1900
+                              maximum: 2100
+                              description: 利用者の誕生年
+                            BirthMonth:
+                              type: integer
+                              minimum: 1
+                              maximum: 12
+                              description: 利用者の誕生月
+                            BirthDay: 
+                              type: integer
+                              minimum: 1
+                              maximum: 31
+                              description: 利用者の誕生日
+                            MoveInStatus: 
+                              type: string
+                              description: 入居状態（入居/退居）
+                            RoomNumber: 
+                              type: string
+                              description: 部屋番号
+                            GroupNumber: 
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: グループID
+                            GroupName: 
+                              type: string
+                              description: グループ名
+                            DeviceID:
+                              type: string
+                              description: デバイスID（デバイステーブルの主キーと一致）
+                            IPAddress: 
+                              type: string
+                              description: デバイスのIPアドレス
+                            SubnetMask: 
+                              type: string
+                              description: デバイスのサブネットマスク
+                            Wakeup: 
+                              type: boolean
+                              description: 起床アラート（true:ON/false:OFF）
+                            WakeupTime: 
+                              type: string
+                              description: 起床アラートの判定時刻
+                            GetoutBed: 
+                              type: boolean
+                              description: 離床アラート（true:ON/false:OFF）
+                            GetoutBedTimeFrom: 
+                              type: string
+                              description: 離床アラート判定の開始時刻
+                            GetoutBedTimeTo: 
+                              type: string
+                              description: 離床アラート判定の終了時刻
+                            GetoutBedTimeIntervals: 
+                              type: integer
+                              minimum: 0
+                              maximum: 180
+                              description: 離床アラートの判定時間
+                            GetoutBedLevel: 
+                              type: string
+                              description: 離床判定レベル
+                            LieinBed: 
+                              type: boolean
+                              description: 臥床アラート（true:ON/false:OFF）
+                            LieinBedTimeFrom: 
+                              type: string
+                              description: 臥床アラート判定の開始時刻
+                            LieinBedTimeTo: 
+                              type: string
+                              description: 臥床アラート判定の終了時刻
+                            LieinBedTimeIntervals: 
+                              type: integer
+                              minimum: 60
+                              maximum: 180
+                              description: 臥床アラートの判定時間
+                            LieinBedLevel: 
+                              type: string
+                              description: 臥床判定レベル
+                            HeartRateLimitUpper: 
+                              type: string
+                              description: 心拍アラートの上限値
+                            HeartRateLimitLower: 
+                              type: string
+                              description: 心拍アラートの下限値
+                            HeartRateTimeIntervals: 
+                              type: integer
+                              minimum: 1
+                              maximum: 60
+                              description: 心拍アラートの持続時間
+                            RespirationRateLimitUpper: 
+                              type: string
+                              description: 呼吸アラートの上限値 
+                            RespirationRateLimitLower: 
+                              type: string
+                              description: 呼吸アラートの下限値 
+                            RespirationRateTimeIntervals: 
+                              type: integer
+                              minimum: 1
+                              maximum: 60
+                              description: 呼吸アラートの持続時間
+                            SensorSensitivity: 
+                              type: string
+                              description: センサ感度のマスタ項目数字
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/userlistfile:
+    post:
+      tags:
+        - userlist
+      summary: 【012.AddUserListFileSysMng】
+      operationId: add_user_list_csv_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                CorpID:
+                  type: integer
+                  description: 法人ID（法人テーブルの主キーと一致）
+                FacilityID:
+                  type: string
+                  description: 施設ID（施設テーブルの主キーと一致）
+                UserData:
+                  type: array
+                  items:
+                    type: object
+                    description: 一括登録したい利用者情報
+                    title: 一括登録したい利用者情報
+                    properties:
+                      UserID:
+                        type: string
+                        description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                      UserName:
+                        type: string
+                        description: 利用者の氏名
+                      UserNameKana:
+                        type: string
+                        description: 利用者氏名のふりがな
+                      Gender: 
+                        type: string
+                        description: 利用者の性別（男/女）
+                      BirthYear: 
+                        type: integer
+                        minimum: 1900
+                        maximum: 2100
+                        description: 利用者の誕生年
+                      BirthMonth:
+                        type: integer
+                        minimum: 1
+                        maximum: 12
+                        description: 利用者の誕生月
+                      BirthDay: 
+                        type: integer
+                        minimum: 1
+                        maximum: 31
+                        description: 利用者の誕生日
+                      MoveInStatus: 
+                        type: string
+                        description: 入居状態（入居/退居）
+                      RoomNumber: 
+                        type: string
+                        description: 部屋番号
+                      GroupNumber: 
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: グループID
+                      DeviceID:
+                        type: string
+                        description: デバイスID（デバイステーブルの主キーと一致）
+                      IPAddress: 
+                        type: string
+                        description: デバイスのIPアドレス
+                      SubnetMask: 
+                        type: string
+                        description: デバイスのサブネットマスク
+                      Wakeup: 
+                        type: string
+                        description: 起床アラート（true:ON/false:OFF）
+                      WakeupTime: 
+                        type: string
+                        description: 起床アラートの判定時刻
+                      GetoutBed: 
+                        type: string
+                        description: 離床アラート（true:ON/false:OFF）
+                      GetoutBedTimeFrom: 
+                        type: string
+                        description: 離床アラート判定の開始時刻
+                      GetoutBedTimeTo: 
+                        type: string
+                        description: 離床アラート判定の終了時刻
+                      GetoutBedTimeIntervals: 
+                        type: integer
+                        minimum: 0
+                        maximum: 180
+                        description: 離床アラートの判定時間
+                      GetoutBedLevel: 
+                        type: string
+                        description: 離床判定レベル
+                      LieinBed: 
+                        type: string
+                        description: 臥床アラート（true:ON/false:OFF）
+                      LieinBedTimeFrom: 
+                        type: string
+                        description: 臥床アラート判定の開始時刻
+                      LieinBedTimeTo: 
+                        type: string
+                        description: 臥床アラート判定の終了時刻
+                      LieinBedTimeIntervals: 
+                        type: integer
+                        minimum: 60
+                        maximum: 180
+                        description: 臥床アラートの判定時間
+                      LieinBedLevel: 
+                        type: string
+                        description: 臥床判定レベル
+                      HeartRateLimitUpper: 
+                        type: string
+                        description: 心拍アラートの上限値
+                      HeartRateLimitLower: 
+                        type: string
+                        description: 心拍アラートの下限値
+                      HeartRateTimeIntervals: 
+                        type: integer
+                        minimum: 1
+                        maximum: 60
+                        description: 心拍アラートの持続時間
+                      RespirationRateLimitUpper: 
+                        type: string
+                        description: 呼吸アラートの上限値 
+                      RespirationRateLimitLower: 
+                        type: string
+                        description: 呼吸アラートの下限値 
+                      RespirationRateTimeIntervals: 
+                        type: integer
+                        minimum: 1
+                        maximum: 60
+                        description: 呼吸アラートの持続時間
+                      SensorSensitivity: 
+                        type: string
+                        description: センサ感度のマスタ項目数字
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                description: 施設利用者の情報をCSV一括登録
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/alertlist/{cid}/{fid}:
+    get:
+      tags:
+        - alert
+      summary: 【013.GetAlertListSysMng】
+      operationId: get_alert_list_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 全部屋のアラート履歴データ
+                          title: 全部屋のアラート履歴データ
+                          properties:
+                            AlertTime:
+                              type: string
+                              format: date-time
+                              description: アラート発生日時
+                            RoomNumber:
+                              type: string
+                              description: 部屋番号
+                            UserName:
+                              type: string
+                              description: 利用者の氏名
+                            AlertKinds:
+                              type: string
+                              description: アラート種類の項目マスタ数字
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/devicelist:
+    get:
+      tags:
+        - device
+      summary: 【014.GetDeviceListSysMng】
+      operationId: get_device_list_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 全デバイスの一覧情報
+                          title: 全デバイスの一覧情報
+                          properties:
+                            DeviceID:
+                              type: string
+                              description: デバイスID（デバイステーブルの主キーと一致）
+                            DeviceType:
+                              type: string
+                              description: デバイス種類の項目マスタ数字
+                            RegisterTime:
+                              type: string
+                              format: date-time
+                              description: 登録日時
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    post:
+      tags:
+        - device
+      summary: 【015.AddDeviceListSysMng】
+      operationId: add_device_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 新規登録したいデバイス情報
+              title: 新規登録したいデバイス情報
+              properties:
+                DeviceID: 
+                  type: string
+                  description: デバイスID（デバイステーブルの主キーと一致）
+                DeviceType:
+                  type: string
+                  description: デバイス種類の項目マスタ数字
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                description: デバイスの新規登録
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/devicelist/{did}:
+    put:
+      tags:
+        - device
+      summary: 【018.EditDeviceListSysMng】
+      operationId: edit_device_list_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: did
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 編集したいデバイス情報
+              title: 編集したいデバイス情報
+              properties:
+                DeviceID: 
+                  type: string
+                  description: デバイスID（デバイステーブルの主キーと一致）
+                DeviceType:
+                  type: string
+                  description: デバイス種類の項目マスタ数字
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                description: デバイスの編集
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    delete:
+      tags:
+        - device
+      summary: 【019.DelDeviceListSysMng】
+      operationId: delete_device_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: did
+          in: path
+          required: true
+          schema:
+            type: string
+          description: デバイスID（デバイステーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 削除後のデバイス一覧情報
+                          title: 削除後のデバイス一覧情報
+                          properties:
+                            DeviceID:
+                              type: string
+                              description: デバイスID（デバイステーブルの主キーと一致）
+                            DeviceType:
+                              type: string
+                              description: デバイス種類の項目マスタ数字
+                            RegisterTime:
+                              type: string
+                              format: date-time
+                              description: 登録日時
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/devicekindschoices:
+    get:
+      tags:
+        - device
+      summary: 【016.GetDeviceKindsSysMng】
+      operationId: get_device_kinds_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: センサー（デバイス）種類の一覧
+                          title: センサー（デバイス）種類の一覧
+                          properties:
+                            DeviceTypeName:
+                              type: string
+                              description: デバイスの種類（名称）
+                            DeviceTypeCode:
+                              type: string
+                              description: デバイス種類の項目マスタ数字
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/devicelistfile:
+    post:
+      tags:
+        - device
+      summary: 【017.AddDeviceListFileSysMng】
+      operationId: add_device_list_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                DeviceList:
+                  type: array
+                  items:
+                    type: object
+                    description: 新規一括登録したいデバイス情報
+                    title: 新規一括登録したいデバイス情報
+                    properties:
+                      DeviceID: 
+                        type: string
+                        description: デバイスID（デバイステーブルの主キーと一致）
+                      DeviceTypeName:
+                        type: string
+                        description: デバイスの種類（名称）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                description: 新規デバイスをCSV一括登録
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/login:
+    post:
+      tags:
+        - loginmon
+      summary: 【020.LoginMonApp】
+      operationId: login_monitor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ID:
+                  type: string
+                  description: ログインID
+                PW:
+                  type: string
+                  description: ログインPW
+              required:
+                - ID
+                - PW
+      responses:
+        '200':
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      ChallengeParameters:
+                        type: object
+                      AuthenticationResult:
+                        type: object
+                        properties:
+                          AccessToken:
+                            type: string
+                            description: アクセストークン
+                          ExpiresIn:
+                            type: integer
+                            example: 54000 
+                          TokenType:
+                            type: string
+                            example: Bearer 
+                          RefreshToken:
+                            type: string
+                          IdToken:
+                            type: string
+                          accountId:
+                            type: string
+                            format: uuid
+                      ResponseMetadata:
+                        type: object
+                        properties:
+                          RequestId:
+                            type: string
+                            format: uuid
+                          HTTPStatusCode:
+                            type: integer
+                            example: 200 
+                          HTTPHeaders:
+                            type: object
+                            properties:
+                              date:
+                                type: string
+                                example: Thu, 03 Jul 2025 02:39:17 GMT
+                              content-type:
+                                type: string
+                                example: application/x-amz-json-1.1
+                              content-length:
+                                type: integer
+                                example: 4039 
+                              connection:
+                                type: string
+                                example: keep-alive 
+                              x-amzn-requestid:
+                                type: string
+                                format: uuid
+                          RetryAttempts:
+                            type: integer
+                            example: 0
+                      CookieData:
+                        type: object
+                        properties:
+                          statement:
+                            type: string
+                          sign:
+                            type: string
+                      CorpID:
+                        type: integer
+                        description: 法人ID
+                      FacilityID:
+                        type: string
+                        description: 施設ID
+                      FacilityName:
+                        type: string
+                        description: 施設名
+                      UserID:
+                        type: string
+                        description: モニタアプリのログインID（リクエストのIDと同一）
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/logout:
+    post:
+      tags:
+        - logoutmon
+      summary: 【021.LogoutMonApp】
+      operationId: logout_monitor
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ログアウト成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/sensorgatewaycondition:
+    get:
+      tags:
+        - condition
+      summary: 【022.GetSensorGtwCondMonApp】
+      operationId: get_sensor_gateway_condition_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: CorpID
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: FacilityID
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 当該施設の全ゲートウェイの情報
+                          title: 当該施設の全ゲートウェイの情報
+                          properties:
+                            GatewayID:
+                              type: string
+                              description: ゲートウェイID（ゲートウェイテーブルの主キーと一致）
+                            GatewayName:
+                              type: string
+                              description: 『ホスト名』に表示する情報
+                            Version:
+                              type: string
+                              description: 『バージョン』に表示する情報
+                            MachineType:
+                              type: string
+                              description: 『機器タイプ』に表示する情報
+                            GatewayStatus:
+                              type: string
+                              description: 『状態』に表示する情報
+                      UpdatedTime:
+                        type: string
+                        format: date-time
+                        description: 『最終計測日時』に表示する情報
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /appcommon/userdatamatrix/{cid}/{fid}/{gid}:
+    get:
+      tags:
+        - userdatamatrix
+      summary: 【023.GetUserDataMatrixApp】
+      operationId: get_user_data_matrix_application
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: gid
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 8
+          description: グループID
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    description: モニタ画面のマトリクスデータを取得
+                    title: モニタ画面のマトリクスデータを取得
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 各セルのモニタデータ
+                          title: 各セルのモニタデータ
+                          properties:
+                            UserID:
+                              type: string
+                              description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                            UserName:
+                              type: string
+                              description: 『利用者名』の表示データ                        
+                            Gender: 
+                              type: string
+                              description: 利用者の性別（男/女）
+                            RoomID: 
+                              type: integer
+                              description: 部屋ID（部屋テーブルの主キーと一致）
+                            RoomNumber: 
+                              type: string
+                              description: 『部屋番号』の表示データ
+                            MeasurementStatus: 
+                              type: string
+                              description: 測定状態の項目マスタ数字
+                            HeartRate: 
+                              type: integer
+                              description: 『心拍』の表示データ
+                            RespirationRate: 
+                              type: integer
+                              description: 『呼吸』の表示データ
+                            AlertKinds:
+                              type: string
+                              description: アラート種類の項目マスタ数字
+                            DeviceID: 
+                              type: string
+                              description: デバイスID（デバイステーブルの主キーと一致）
+                            DeviceType: 
+                              type: integer
+                              description: デバイス種類の項目マスタ数字
+                            DeviceStatus: 
+                              type: string
+                              description: 『センサ途絶異常』の判定用データ
+                            SortOrder: 
+                              type: integer
+                              minimum: 1
+                              maximum: 100
+                              description: マトリクス内のセルの並び位置
+                      MeasurementTime: 
+                        type: string
+                        format: date-time
+                        description: 『計測日時』に表示する情報
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    put:
+      tags:
+        - userdatamatrixsort
+      summary: 【024.EditUserDataMatrixMonApp】
+      operationId: edit_user_data_matrix_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: gid
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 8
+          description: グループID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                MonitorData:
+                  type: array
+                  items:
+                    type: object
+                    description: マトリクス内のセルの並び順データ
+                    title: マトリクス内のセルの並び順データ
+                    properties:
+                      RoomID: 
+                        type: integer
+                        description: 部屋ID（部屋テーブルの主キーと一致）
+                      UserID:
+                        type: string
+                        description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                      DeviceID: 
+                        type: string
+                        description: デバイスID（デバイステーブルの主キーと一致）
+                      SortOrder: 
+                        type: integer
+                        minimum: 1
+                        maximum: 100
+                        description: マトリクス内のセルの並び位置
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    description: モニタ画面のマトリクスデータを取得
+                    title: モニタ画面のマトリクスデータを取得
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 各セルのモニタデータ
+                          title: 各セルのモニタデータ
+                          properties:
+                            UserID:
+                              type: string
+                              description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                            UserName:
+                              type: string
+                              description: 『利用者名』の表示データ                        
+                            Gender: 
+                              type: string
+                              description: 利用者の性別（男/女）
+                            RoomID: 
+                              type: integer
+                              description: 部屋ID（部屋テーブルの主キーと一致）
+                            RoomNumber: 
+                              type: string
+                              description: 『部屋番号』の表示データ
+                            MeasurementStatus: 
+                              type: string
+                              description: 測定状態の項目マスタ数字
+                            HeartRate: 
+                              type: integer
+                              description: 『心拍』の表示データ
+                            RespirationRate: 
+                              type: integer
+                              description: 『呼吸』の表示データ
+                            AlertKinds:
+                              type: string
+                              description: アラート種類の項目マスタ数字
+                            DeviceID: 
+                              type: string
+                              description: デバイスID（デバイステーブルの主キーと一致）
+                            DeviceType: 
+                              type: integer
+                              description: デバイス種類の項目マスタ数字
+                            DeviceStatus: 
+                              type: string
+                              description: 『センサ途絶異常』の判定用データ
+                            SortOrder: 
+                              type: integer
+                              minimum: 1
+                              maximum: 100
+                              description: マトリクス内のセルの並び位置
+                      MeasurementTime: 
+                        type: string
+                        format: date-time
+                        description: 『計測日時』に表示する情報
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /appcommon/userdatadetail/{uid}:
+    get:
+      tags:
+        - userdata
+      summary: 【025.GetUserDataDetailApp】
+      operationId: get_user_data_application
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: CorpID
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: FacilityID
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    description: 利用者の詳細データ取得
+                    title: 利用者の詳細データ取得
+                    properties:
+                      MeasurementStatusSummary: 
+                        type: array
+                        items:
+                          type: object
+                          description: 『体動ステータスバー』の表示データ
+                          title: 『体動ステータスバー』の表示データ
+                          properties:
+                            Time: 
+                              type: string
+                              example: "hh:mm"
+                              description: 横軸の時刻
+                            MeasurementStatus: 
+                              type: string
+                              description: 測定状態の項目マスタ数字
+                            Alert:
+                              type: boolean
+                              description: trueの時刻はバーの上に『▼』を表示する
+                      HeartRateSummary: 
+                        type: array
+                        items:
+                          type: object
+                          description: 『心拍グラフ』の表示データ
+                          title: 『心拍グラフ』の表示データ
+                          properties:
+                            Time: 
+                              type: string
+                              example: "hh:mm"
+                              description: 横軸の時刻
+                            Value: 
+                              type: integer
+                              description: 心拍の数値
+                      RespirationRateSummary: 
+                        type: array
+                        items:
+                          type: object
+                          description: 『呼吸グラフ』の表示データ
+                          title: 『呼吸グラフ』の表示データ
+                          properties:
+                            Time: 
+                              type: string
+                              example: "hh:mm"
+                              description: 横軸の時刻
+                            Value: 
+                              type: integer
+                              description: 呼吸の数値
+                      AlertSettings: 
+                        type: object
+                        description: 『アラート設定』の表示データ
+                        title: 『アラート設定』の表示データ
+                        properties:
+                          Wakeup: 
+                            type: boolean
+                            description: 起床アラート（true:ON/false:OFF）
+                          WakeupTime: 
+                            type: string
+                            description: 起床アラートの判定時刻
+                          GetoutBed: 
+                            type: boolean
+                            description: 離床アラート（true:ON/false:OFF）
+                          GetoutBedTimeFrom: 
+                            type: string
+                            description: 離床アラート判定の開始時刻
+                          GetoutBedTimeTo: 
+                            type: string
+                            description: 離床アラート判定の終了時刻
+                          GetoutBedTimeIntervals: 
+                            type: integer
+                            minimum: 0
+                            maximum: 180
+                            description: 離床アラートの判定時間
+                          GetoutBedLevel: 
+                            type: string
+                            description: 離床判定レベル
+                          LieinBed: 
+                            type: boolean
+                            description: 臥床アラート（true:ON/false:OFF）
+                          LieinBedTimeFrom: 
+                            type: string
+                            description: 臥床アラート判定の開始時刻
+                          LieinBedTimeTo: 
+                            type: string
+                            description: 臥床アラート判定の終了時刻
+                          LieinBedTimeIntervals: 
+                            type: integer
+                            minimum: 60
+                            maximum: 180
+                            description: 臥床アラートの判定時間
+                          LieinBedLevel: 
+                            type: string
+                            description: 臥床判定レベル
+                          HeartRateLimitUpper: 
+                            type: string
+                            description: 心拍アラートの上限値
+                          HeartRateLimitLower: 
+                            type: string
+                            description: 心拍アラートの下限値
+                          HeartRateTimeIntervals: 
+                            type: integer
+                            minimum: 1
+                            maximum: 60
+                            description: 心拍アラートの持続時間
+                          RespirationRateLimitUpper: 
+                            type: string
+                            description: 呼吸アラートの上限値 
+                          RespirationRateLimitLower: 
+                            type: string
+                            description: 呼吸アラートの下限値 
+                          RespirationRateTimeIntervals: 
+                            type: integer
+                            minimum: 1
+                            maximum: 60
+                            description: 呼吸アラートの持続時間
+                          SensorSensitivity: 
+                            type: string
+                            description: センサ感度のマスタ項目数字
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/alertsettings/{uid}:
+    put:
+      tags:
+        - alertsetting
+      summary: 【027.EditAlertSettingsMonApp】
+      operationId: edit_alert_settings_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: アラート設定のデータ
+              title: アラート設定のデータ
+              properties:
+                CorpID:
+                  type: integer
+                  description: 法人ID（法人テーブルの主キーと一致）
+                FacilityID:
+                  type: string
+                  description: 施設ID（施設テーブルの主キーと一致）
+                Wakeup: 
+                  type: boolean
+                  description: 起床アラート（true:ON/false:OFF）
+                WakeupTime: 
+                  type: string
+                  description: 起床アラートの判定時刻
+                GetoutBed: 
+                  type: boolean
+                  description: 離床アラート（true:ON/false:OFF）
+                GetoutBedTimeFrom: 
+                  type: string
+                  description: 離床アラート判定の開始時刻
+                GetoutBedTimeTo: 
+                  type: string
+                  description: 離床アラート判定の終了時刻
+                GetoutBedTimeIntervals: 
+                  type: integer
+                  minimum: 0
+                  maximum: 180
+                  description: 離床アラートの判定時間
+                GetoutBedLevel: 
+                  type: string
+                  description: 離床判定レベル
+                LieinBed: 
+                  type: boolean
+                  description: 臥床アラート（true:ON/false:OFF）
+                LieinBedTimeFrom: 
+                  type: string
+                  description: 臥床アラート判定の開始時刻
+                LieinBedTimeTo: 
+                  type: string
+                  description: 臥床アラート判定の終了時刻
+                LieinBedTimeIntervals: 
+                  type: integer
+                  minimum: 60
+                  maximum: 180
+                  description: 臥床アラートの判定時間
+                LieinBedLevel: 
+                  type: string
+                  description: 臥床判定レベル
+                HeartRateLimitUpper: 
+                  type: string
+                  description: 心拍アラートの上限値
+                HeartRateLimitLower: 
+                  type: string
+                  description: 心拍アラートの下限値
+                HeartRateTimeIntervals: 
+                  type: integer
+                  minimum: 1
+                  maximum: 60
+                  description: 心拍アラートの持続時間
+                RespirationRateLimitUpper: 
+                  type: string
+                  description: 呼吸アラートの上限値 
+                RespirationRateLimitLower: 
+                  type: string
+                  description: 呼吸アラートの下限値 
+                RespirationRateTimeIntervals: 
+                  type: integer
+                  minimum: 1
+                  maximum: 60
+                  description: 呼吸アラートの持続時間
+                SensorSensitivity: 
+                  type: string
+                  description: センサ感度のマスタ項目数字
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                description: 利用者のアラート設定更新完了
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /appcommon/clearalert/{uid}:
+    put:
+      tags:
+        - clearalert
+      summary: 【028.ClearAlertApp】
+      operationId: clear_alert_application
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 解除したいアラート情報
+              title: 解除したいアラート情報
+              properties:
+                CorpID:
+                  type: integer
+                  description: 法人ID（法人テーブルの主キーと一致）
+                FacilityID:
+                  type: string
+                  description: 施設ID（施設テーブルの主キーと一致）
+                DeviceID: 
+                  type: string
+                  description: デバイスID（デバイステーブルの主キーと一致）
+                RoomID:
+                  type: integer
+                  description: 部屋ID（部屋テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                description: デバイスの編集
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/userdatafile/{uid}:
+    get:
+      tags:
+        - userdatafile
+      summary: 【029.GetUserDataFileMonApp】
+      operationId: get_user_data_csv_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: CorpID
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: FacilityID
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+        - name: Start
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: 出力開始日時
+        - name: End
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: 出力終了日時
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      MeasurementStatusList: 
+                        type: string
+                        example: 状態,10:安静、20:体動、80:離床,,
+                        description: 測定状態の項目マスタ一覧
+                      SummaryDataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 利用者の詳細データ一覧
+                          title: 利用者の詳細データ一覧
+                          properties:
+                            Time: 
+                              type: string
+                              example: "yyyy/mm/dd hh:mm"
+                              description: 測定日時
+                            MeasurementStatus: 
+                              type: string
+                              description: 測定状態の項目マスタ数字
+                            HeartRateValue:
+                              type: integer
+                              description: 心拍の数値
+                            RespirationRateValue:
+                              type: integer
+                              description: 呼吸の数値
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/userdatagraph/{uid}:
+    get:
+      tags:
+        - userdatafile
+      summary: 【030.GetUserDataGraphMonApp】
+      operationId: get_user_data_graph_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+          description: 実装する！！（031.と共通化）
+        - name: CorpID
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: FacilityID
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+        - name: Start
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: データ取得範囲の開始日時（未指定⇒『"End"の日付マイナス8日』の00:00）
+        - name: End
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: データ取得範囲の終了日時（未指定⇒現在時刻）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      SummaryDataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 利用者の詳細データ一覧
+                          title: 利用者の詳細データ一覧
+                          properties:
+                            Time: 
+                              type: string
+                              example: "yyyy/mm/dd hh:mm"
+                              description: 測定日時
+                            MeasurementStatus: 
+                              type: string
+                              description: 測定状態の項目マスタ数字
+                            HeartRateValue:
+                              type: integer
+                              description: 心拍の数値
+                            RespirationRateValue:
+                              type: integer
+                              description: 呼吸の数値
+                      AlertDataList:
+                        type: array
+                        items:
+                          type: object
+                          description: アラート履歴データ
+                          title: アラート履歴データ
+                          properties:
+                            AlertTime:
+                              type: string
+                              format: date-time
+                              description: アラート発生日時
+                            AlertKinds:
+                              type: string
+                              description: アラート種類の項目マスタ数字
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/stafflist/{cid}/{fid}:
+    get:
+      tags:
+        - stafflist
+      summary: 【032.GetStaffListMonApp】
+      operationId: get_staff_list_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 当該施設のスタッフデータ
+                          title: 当該施設のスタッフデータ
+                          properties:
+                            StaffID:
+                              type: integer
+                              description: スタッフID（スタッフテーブルの主キーと一致）
+                            Name: 
+                              type: string
+                              description: 『氏名』カラムに表示するデータ
+                            MailAddress: 
+                              type: string
+                              format: email
+                              description: 『E-mail』カラムに表示するデータ
+                            LINEIntegration: 
+                              type: boolean
+                              description: 『LINE連携』カラムに表示するデータ（true:あり/false:なし）
+                            UpdatedTime: 
+                              type: string
+                              format: date-time
+                              description: 『最終更新日時』カラムに表示するデータ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    post:
+      tags:
+        - stafflist
+      summary: 【033.AddStaffListMonApp】
+      operationId: add_staff_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 追加スタッフのデータ
+              title: 追加スタッフのデータ
+              properties:
+                Name: 
+                  type: string
+                  description: 氏名データ
+                MailAddress: 
+                  type: string
+                  format: email
+                  description: E-mailデータ
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/stafflist/{cid}/{fid}/{sid}:
+    put:
+      tags:
+        - stafflist
+      summary: 【034.EditStaffListMonApp】
+      operationId: edit_staff_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: スタッフID（スタッフテーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: スタッフデータの変更
+              title: スタッフデータの変更
+              properties:
+                Name: 
+                  type: string
+                  description: 氏名データ
+                MailAddress: 
+                  type: string
+                  format: email
+                  description: E-mailデータ
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    get:
+      tags:
+        - stafflist
+      summary: 【063.GetStaffDataMonApp】
+      operationId: get_staff_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: スタッフID（スタッフテーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      Name: 
+                        type: string
+                        description: 氏名データ
+                      MailAddress: 
+                        type: string
+                        format: email
+                        description: E-mailデータ
+                      LINECooperationList:
+                        type: array
+                        description: LINE連携している利用者一覧
+                        items:
+                          type: object
+                          properties:
+                            UserName:
+                              type: string
+                              description: 利用者氏名
+                            RoomNumber:
+                              type: string
+                              description: 部屋番号
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    delete:
+      tags:
+        - stafflist
+      summary: 【035.DelStaffListMonApp】
+      operationId: delete_staff_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: スタッフID（スタッフテーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 削除実行後のスタッフ一覧データ
+                          title: 削除実行後のスタッフ一覧データ
+                          properties:
+                            StaffID:
+                              type: integer
+                              description: スタッフID（スタッフテーブルの主キーと一致）
+                            Name: 
+                              type: string
+                              description: 『氏名』カラムに表示するデータ
+                            MailAddress: 
+                              type: string
+                              format: email
+                              description: 『E-mail』カラムに表示するデータ
+                            LINEIntegration: 
+                              type: boolean
+                              description: 『LINE連携』カラムに表示するデータ（true:あり/false:なし）
+                            UpdatedTime: 
+                              type: string
+                              format: date-time
+                              description: 『最終更新日時』カラムに表示するデータ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/userinfo:
+    get:
+      tags:
+        - userinfo
+      summary: 【036.GetUserInfoMonApp】
+      operationId: get_user_information_list_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: CorpID
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: FacilityID
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 当該施設の全利用者データ
+                          title: 当該施設の全利用者データ
+                          properties:
+                            UserID:
+                              type: string
+                              description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                            MoveInStatus: 
+                              type: string
+                              description: 『入居状況』のカラムに表示するデータ
+                            Name:
+                              type: string
+                              description: 『氏名』のカラムに表示するデータ
+                            Gender: 
+                              type: string
+                              description: 『性別』のカラムに表示するデータ
+                            BirthDay: 
+                              type: string
+                              format: date
+                              description: 『生年月日』のカラムに表示するデータ
+                            UpdatedTime:
+                              type: string
+                              format: date-time
+                              description: 『最終更新日時』のカラムに表示するデータ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    post:
+      tags:
+        - userinfo
+      summary: 【037.AddUserInfoMonApp】
+      operationId: add_user_information_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 登録したい利用者の情報
+              title: 登録したい利用者の情報
+              properties:
+                CorpID:
+                  type: integer
+                  description: 法人ID（法人テーブルの主キーと一致）
+                FacilityID:
+                  type: string
+                  description: 施設ID（施設テーブルの主キーと一致）
+                UserName:
+                  type: string
+                  description: 利用者の氏名
+                UserNameKana:
+                  type: string
+                  description: 利用者氏名のふりがな
+                Gender: 
+                  type: string
+                  description: 利用者の性別（男/女）
+                BirthYear: 
+                  type: integer
+                  minimum: 1900
+                  maximum: 2100
+                  description: 利用者の誕生年
+                BirthMonth:
+                  type: integer
+                  minimum: 1
+                  maximum: 12
+                  description: 利用者の誕生月
+                BirthDay: 
+                  type: integer
+                  minimum: 1
+                  maximum: 31
+                  description: 利用者の誕生日
+                MoveInStatus: 
+                  type: string
+                  description: 入居状態（入居/退居）
+                LINECooperation:
+                  type: array
+                  items:
+                    type: integer
+                    description: LINE連携するスタッフID（スタッフテーブルの主キーと一致）
+                CarekarteID:
+                  type: string
+                  description:  CAREKARTE ID
+                Remarks:
+                  type: string
+                  description: 備考
+                Wakeup: 
+                  type: boolean
+                  description: 起床アラート（true:ON/false:OFF）
+                WakeupTime: 
+                  type: string
+                  description: 起床アラートの判定時刻
+                GetoutBed: 
+                  type: boolean
+                  description: 離床アラート（true:ON/false:OFF）
+                GetoutBedTimeFrom: 
+                  type: string
+                  description: 離床アラート判定の開始時刻
+                GetoutBedTimeTo: 
+                  type: string
+                  description: 離床アラート判定の終了時刻
+                GetoutBedTimeIntervals: 
+                  type: integer
+                  minimum: 0
+                  maximum: 180
+                  description: 離床アラートの判定時間
+                GetoutBedLevel: 
+                  type: string
+                  description: 離床判定レベル
+                LieinBed: 
+                  type: boolean
+                  description: 臥床アラート（true:ON/false:OFF）
+                LieinBedTimeFrom: 
+                  type: string
+                  description: 臥床アラート判定の開始時刻
+                LieinBedTimeTo: 
+                  type: string
+                  description: 臥床アラート判定の終了時刻
+                LieinBedTimeIntervals: 
+                  type: integer
+                  minimum: 60
+                  maximum: 180
+                  description: 臥床アラートの判定時間
+                LieinBedLevel: 
+                  type: string
+                  description: 臥床判定レベル
+                HeartRateLimitUpper: 
+                  type: string
+                  description: 心拍アラートの上限値
+                HeartRateLimitLower: 
+                  type: string
+                  description: 心拍アラートの下限値
+                HeartRateTimeIntervals: 
+                  type: integer
+                  minimum: 1
+                  maximum: 60
+                  description: 心拍アラートの持続時間
+                RespirationRateLimitUpper: 
+                  type: string
+                  description: 呼吸アラートの上限値 
+                RespirationRateLimitLower: 
+                  type: string
+                  description: 呼吸アラートの下限値 
+                RespirationRateTimeIntervals: 
+                  type: integer
+                  minimum: 1
+                  maximum: 60
+                  description: 呼吸アラートの持続時間
+                SensorSensitivity: 
+                  type: string
+                  description: センサ感度のマスタ項目数字
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/userinfo/{uid}:
+    put:
+      tags:
+        - userinfo
+      summary: 【039.EditUserInfoMonApp】
+      operationId: edit_user_information_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 編集したい利用者の情報
+              title: 編集したい利用者の情報
+              properties:
+                CorpID:
+                  type: integer
+                  description: 法人ID（法人テーブルの主キーと一致）
+                FacilityID:
+                  type: string
+                  description: 施設ID（施設テーブルの主キーと一致）
+                UserName:
+                  type: string
+                  description: 利用者の氏名
+                UserNameKana:
+                  type: string
+                  description: 利用者氏名のふりがな
+                Gender: 
+                  type: string
+                  description: 利用者の性別（男/女）
+                BirthYear: 
+                  type: integer
+                  minimum: 1900
+                  maximum: 2100
+                  description: 利用者の誕生年
+                BirthMonth:
+                  type: integer
+                  minimum: 1
+                  maximum: 12
+                  description: 利用者の誕生月
+                BirthDay: 
+                  type: integer
+                  minimum: 1
+                  maximum: 31
+                  description: 利用者の誕生日
+                MoveInStatus: 
+                  type: string
+                  description: 入居状態（入居/退居）
+                LINECooperation:
+                  type: array
+                  items:
+                    type: integer
+                    description: LINE連携するスタッフID（スタッフテーブルの主キーと一致）
+                CarekarteID:
+                  type: string
+                  description:  CAREKARTE ID
+                Remarks:
+                  type: string
+                  description: 備考
+                Wakeup: 
+                  type: boolean
+                  description: 起床アラート（true:ON/false:OFF）
+                WakeupTime: 
+                  type: string
+                  description: 起床アラートの判定時刻
+                GetoutBed: 
+                  type: boolean
+                  description: 離床アラート（true:ON/false:OFF）
+                GetoutBedTimeFrom: 
+                  type: string
+                  description: 離床アラート判定の開始時刻
+                GetoutBedTimeTo: 
+                  type: string
+                  description: 離床アラート判定の終了時刻
+                GetoutBedTimeIntervals: 
+                  type: integer
+                  minimum: 0
+                  maximum: 180
+                  description: 離床アラートの判定時間
+                GetoutBedLevel: 
+                  type: string
+                  description: 離床判定レベル
+                LieinBed: 
+                  type: boolean
+                  description: 臥床アラート（true:ON/false:OFF）
+                LieinBedTimeFrom: 
+                  type: string
+                  description: 臥床アラート判定の開始時刻
+                LieinBedTimeTo: 
+                  type: string
+                  description: 臥床アラート判定の終了時刻
+                LieinBedTimeIntervals: 
+                  type: integer
+                  minimum: 60
+                  maximum: 180
+                  description: 臥床アラートの判定時間
+                LieinBedLevel: 
+                  type: string
+                  description: 臥床判定レベル
+                HeartRateLimitUpper: 
+                  type: string
+                  description: 心拍アラートの上限値
+                HeartRateLimitLower: 
+                  type: string
+                  description: 心拍アラートの下限値
+                HeartRateTimeIntervals: 
+                  type: integer
+                  minimum: 1
+                  maximum: 60
+                  description: 心拍アラートの持続時間
+                RespirationRateLimitUpper: 
+                  type: string
+                  description: 呼吸アラートの上限値 
+                RespirationRateLimitLower: 
+                  type: string
+                  description: 呼吸アラートの下限値 
+                RespirationRateTimeIntervals: 
+                  type: integer
+                  minimum: 1
+                  maximum: 60
+                  description: 呼吸アラートの持続時間
+                SensorSensitivity: 
+                  type: string
+                  description: センサ感度のマスタ項目数字
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    delete:
+      tags:
+        - userinfo
+      summary: 【040.DelUserInfoMonApp】
+      operationId: delete_user_information_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                CorpID:
+                  type: integer
+                  description: 法人ID（法人テーブルの主キーと一致）
+                FacilityID:
+                  type: string
+                  description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 当該施設の全利用者データ
+                          title: 当該施設の全利用者データ
+                          properties:
+                            UserID:
+                              type: string
+                              description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                            MoveInStatus: 
+                              type: string
+                              description: 『入居状況』のカラムに表示するデータ
+                            Name:
+                              type: string
+                              description: 『氏名』のカラムに表示するデータ
+                            Gender: 
+                              type: string
+                              description: 『性別』のカラムに表示するデータ
+                            BirthDay: 
+                              type: string
+                              format: date
+                              description: 『生年月日』のカラムに表示するデータ
+                            UpdatedTime:
+                              type: string
+                              format: date-time
+                              description: 『最終更新日時』のカラムに表示するデータ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    get:
+      tags:
+        - userinfo
+      summary: 【064.GetUserInfoDataMonApp】
+      operationId: get_user_information_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: CorpID
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: FacilityID
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: uid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      UserName:
+                        type: string
+                        description: 利用者の氏名
+                      UserNameKana:
+                        type: string
+                        description: 利用者氏名のふりがな
+                      Gender: 
+                        type: string
+                        description: 利用者の性別（男/女）
+                      BirthYear: 
+                        type: integer
+                        minimum: 1900
+                        maximum: 2100
+                        description: 利用者の誕生年
+                      BirthMonth:
+                        type: integer
+                        minimum: 1
+                        maximum: 12
+                        description: 利用者の誕生月
+                      BirthDay: 
+                        type: integer
+                        minimum: 1
+                        maximum: 31
+                        description: 利用者の誕生日
+                      MoveInStatus: 
+                        type: string
+                        description: 入居状態（入居/退居）
+                      LINECooperation:
+                        type: array
+                        items:
+                          type: object
+                          description: LINE連携するスタッフ一覧
+                          properties:
+                            StaffID:
+                              type: integer
+                              description: LINE連携するスタッフID（スタッフテーブルの主キーと一致）
+                            StaffName:
+                              type: string
+                              description: LINE連携するスタッフ氏名
+                      CarekarteID:
+                        type: string
+                        description:  CAREKARTE ID
+                      Remarks:
+                        type: string
+                        description: 備考
+                      Wakeup: 
+                        type: boolean
+                        description: 起床アラート（true:ON/false:OFF）
+                      WakeupTime: 
+                        type: string
+                        description: 起床アラートの判定時刻
+                      GetoutBed: 
+                        type: boolean
+                        description: 離床アラート（true:ON/false:OFF）
+                      GetoutBedTimeFrom: 
+                        type: string
+                        description: 離床アラート判定の開始時刻
+                      GetoutBedTimeTo: 
+                        type: string
+                        description: 離床アラート判定の終了時刻
+                      GetoutBedTimeIntervals: 
+                        type: integer
+                        minimum: 0
+                        maximum: 180
+                        description: 離床アラートの判定時間
+                      GetoutBedLevel: 
+                        type: string
+                        description: 離床判定レベル
+                      LieinBed: 
+                        type: boolean
+                        description: 臥床アラート（true:ON/false:OFF）
+                      LieinBedTimeFrom: 
+                        type: string
+                        description: 臥床アラート判定の開始時刻
+                      LieinBedTimeTo: 
+                        type: string
+                        description: 臥床アラート判定の終了時刻
+                      LieinBedTimeIntervals: 
+                        type: integer
+                        minimum: 60
+                        maximum: 180
+                        description: 臥床アラートの判定時間
+                      LieinBedLevel: 
+                        type: string
+                        description: 臥床判定レベル
+                      HeartRateLimitUpper: 
+                        type: string
+                        description: 心拍アラートの上限値
+                      HeartRateLimitLower: 
+                        type: string
+                        description: 心拍アラートの下限値
+                      HeartRateTimeIntervals: 
+                        type: integer
+                        minimum: 1
+                        maximum: 60
+                        description: 心拍アラートの持続時間
+                      RespirationRateLimitUpper: 
+                        type: string
+                        description: 呼吸アラートの上限値 
+                      RespirationRateLimitLower: 
+                        type: string
+                        description: 呼吸アラートの下限値 
+                      RespirationRateTimeIntervals: 
+                        type: integer
+                        minimum: 1
+                        maximum: 60
+                        description: 呼吸アラートの持続時間
+                      SensorSensitivity: 
+                        type: string
+                        description: センサ感度のマスタ項目数字
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/staffchoices/{cid}/{fid}:
+    get:
+      tags:
+        - choice
+      summary: 【042.GetStaffChoicesMonApp】
+      operationId: get_staff_choices_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 当該施設でLINE連携可能なスタッフの一覧
+                          title: 当該施設でLINE連携可能なスタッフの一覧
+                          properties:
+                            StaffID:
+                              type: integer
+                              description: スタッフID（スタッフテーブルの主キーと一致）
+                            Name:
+                              type: string
+                              description: 『連携スタッフ』の選択肢（の1つ）のスタッフ氏名
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/roomlist/{cid}/{fid}:
+    get:
+      tags:
+        - roomlist
+      summary: 【043.GetRoomListMonApp】
+      operationId: get_room_list_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 当該施設の部屋一覧
+                          title: 当該施設の部屋一覧
+                          properties:
+                            RoomID:
+                              type: integer
+                              description: 部屋ID（部屋テーブルの主キーと一致）
+                            RoomNumber:
+                              type: string
+                              description: 『部屋番号』の表示データ
+                            UserID:
+                              type: string
+                              description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                            UserName:
+                              type: string
+                              description: 『氏名』の表示データ
+                            GroupID:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: グループID
+                            GroupName:
+                              type: string
+                              description: 『グループ』の表示データ
+                            DeviceID: 
+                              type: string
+                              description: 『デバイスID』の表示データ
+                            UpdatedTime:
+                              type: string
+                              format: date-time
+                              description: 『最終更新日時』の表示データ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    post:
+      tags:
+        - roomlist
+      summary: 【044.AddRoomListMonApp】
+      operationId: add_room_list_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                RoomNumber:
+                  type: string
+                  description: 部屋番号
+                UserID:
+                  type: string
+                  description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                GroupNumber:
+                  type: integer
+                  minimum: 1
+                  maximum: 8
+                  description: グループID
+                DeviceID:
+                  type: string
+                  description: デバイスID（デバイステーブルの主キーと一致）
+                IPAddress: 
+                  type: string
+                  description: デバイスのIPアドレス
+                SubnetMask: 
+                  type: string
+                  description: デバイスのサブネットマスク
+                ExtensionPhoneNumber:
+                  type: string
+                  description: 内線番号
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/roomlist/{cid}/{fid}/{rid}:
+    put:
+      tags:
+        - roomlist
+      summary: 【045.EditRoomListMonApp】
+      operationId: edit_room_list_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: rid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 部屋ID（部屋テーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                RoomNumber:
+                  type: string
+                  description: 部屋番号
+                GroupNumber:
+                  type: integer
+                  minimum: 1
+                  maximum: 8
+                  description: グループID
+                DeviceID:
+                  type: string
+                  description: デバイスID（デバイステーブルの主キーと一致）
+                IPAddress: 
+                  type: string
+                  description: デバイスのIPアドレス
+                SubnetMask: 
+                  type: string
+                  description: デバイスのサブネットマスク
+                ExtensionPhoneNumber:
+                  type: string
+                  description: 内線番号
+                UserID:
+                  type: string
+                  description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    delete:
+      tags:
+        - roomlist
+      summary: 【046.DelRoomListMonApp】
+      operationId: delete_room_list_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: rid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 部屋ID（部屋テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: 削除実行後の部屋一覧データ
+                          title: 削除実行後の部屋一覧データ
+                          properties:
+                            RoomID:
+                              type: integer
+                              description: 部屋ID（部屋テーブルの主キーと一致）
+                            RoomNumber:
+                              type: string
+                              description: 『部屋番号』の表示データ
+                            UserID:
+                              type: string
+                              description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                            UserName:
+                              type: string
+                              description: 『氏名』の表示データ
+                            GroupID:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: グループID
+                            GroupName:
+                              type: string
+                              description: 『グループ』の表示データ
+                            DeviceID: 
+                              type: string
+                              description: 『デバイスID』の表示データ
+                            UpdatedTime:
+                              type: string
+                              format: date-time
+                              description: 『最終更新日時』の表示データ
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    get:
+      tags:
+        - roomlist
+      summary: 【065.GetRoomDataMonApp】
+      operationId: get_room_data_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+        - name: rid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 部屋ID（部屋テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      RoomNumber:
+                        type: string
+                        description: 部屋番号
+                      GroupNumber:
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: グループID
+                      GroupName:
+                        type: string
+                        description: グループ名
+                      DeviceID:
+                        type: string
+                        description: デバイスID（デバイステーブルの主キーと一致）
+                      IPAddress: 
+                        type: string
+                        description: デバイスのIPアドレス
+                      SubnetMask: 
+                        type: string
+                        description: デバイスのサブネットマスク
+                      ExtensionPhoneNumber:
+                        type: string
+                        description: 内線番号
+                      UserID:
+                        type: string
+                        description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                      UserName:
+                        type: string
+                        description: 利用者の氏名
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/groupnamelist/{cid}/{fid}:
+    put:
+      tags:
+        - groupname
+      summary: 【047.EditGroupNameListMonApp】
+      operationId: edit_group_name_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GroupInformation:
+                  type: array
+                  items:
+                    type: object
+                    description: グループ名情報
+                    title: グループ名情報
+                    properties:
+                      GroupNumber:
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: グループID
+                      GroupName:
+                        type: string
+                        description: グループ名
+                      SortNumber:
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: 整列順序
+                      SoundWakeup:
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: 起床アラート発報時に鳴らす音源番号
+                      SoundGetout:
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: 離床アラート発報時に鳴らす音源番号
+                      SoundLiein:
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: 臥床アラート発報時に鳴らす音源番号
+                      SoundHeartRateUpper:
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: 心拍上限アラート発報時に鳴らす音源番号
+                      SoundHeartRateLower:
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: 心拍下限アラート発報時に鳴らす音源番号
+                      SoundRespirationUpper:
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: 呼吸上限アラート発報時に鳴らす音源番号
+                      SoundRespirationLower:
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: 呼吸下限アラート発報時に鳴らす音源番号
+                      SoundCalling:
+                        type: integer
+                        minimum: 1
+                        maximum: 8
+                        description: 呼び出しアラート発報時に鳴らす音源番号
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    get:
+      tags:
+        - groupname
+      summary: 【048.GetGroupNameMonApp】
+      operationId: get_group_name_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      GroupInformation:
+                        type: array
+                        items:
+                          type: object
+                          description: 有効なグループ名とそのソート順
+                          title: 有効なグループ名とそのソート順
+                          properties:
+                            GroupNumber:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: グループID
+                            GroupName:
+                              type: string
+                              description: グループ名
+                            SortNumber:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: 整列順序
+                            SoundWakeup:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: 起床アラート発報時に鳴らす音源番号
+                            SoundGetout:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: 離床アラート発報時に鳴らす音源番号
+                            SoundLiein:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: 臥床アラート発報時に鳴らす音源番号
+                            SoundHeartRateUpper:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: 心拍上限アラート発報時に鳴らす音源番号
+                            SoundHeartRateLower:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: 心拍下限アラート発報時に鳴らす音源番号
+                            SoundRespirationUpper:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: 呼吸上限アラート発報時に鳴らす音源番号
+                            SoundRespirationLower:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: 呼吸下限アラート発報時に鳴らす音源番号
+                            SoundCalling:
+                              type: integer
+                              minimum: 1
+                              maximum: 8
+                              description: 呼び出しアラート発報時に鳴らす音源番号
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/userchoices/{cid}/{fid}:
+    get:
+      tags:
+        - choice
+      summary: 【049.GetUserChoicesMonApp】
+      operationId: get_user_choices_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 法人ID（法人テーブルの主キーと一致）
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 施設ID（施設テーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataList:
+                        type: array
+                        items:
+                          type: object
+                          description: まだ部屋に紐づけられていない利用者の一覧
+                          title: まだ部屋に紐づけられていない利用者の一覧
+                          properties:
+                            UserID:
+                              type: string
+                              description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                            Name:
+                              type: string
+                              description: 利用者の氏名
+                            BirthDay: 
+                              type: string
+                              format: date
+                              description: 利用者の生年月日
+                            Remarks:
+                              type: string
+                              description: 備考
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/authcode:
+    post:
+      tags:
+        - authcodereq
+      summary: 【050.ReqAuthCodeMonApp】
+      operationId: request_authorization_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /monitorapp/resetpassword:
+    post:
+      tags:
+        - resetpwd
+      summary: 【051.ReqResetPwdMonApp】
+      operationId: request_reset_password_monitor
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                UserID:
+                  type: string
+                  description: 個人コード＆利用者ID（利用者テーブルの主キーと一致）
+                PassCode:
+                  type: string
+                  description: 認証コード
+                CurrentPW:
+                  type: string
+                  description: 現在のパスワード
+                NewPW: 
+                  type: string
+                  description: 新しいパスワード
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /smartphoneapp/authcode:
+    post:
+      tags:
+        - authcode
+      summary: 【052.ReqAuthCodeSmphApp】
+      operationId: request_authorization_smartphone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ID:
+                  type: string
+                  description: ログインアカウント
+                PW:
+                  type: string
+                  description: ログインパスワード
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /smartphoneapp/login:
+    post:
+      tags:
+        - login
+      summary: 【053.LoginSmphApp】
+      operationId: login_smartphone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ID:
+                  type: string
+                  description: ログインID
+                PW:
+                  type: string
+                  description: ログインPW
+                OneTimePassCode:
+                  type: string
+                  description: 認証コード
+              required:
+                - ID
+                - PW
+                - OneTimePassCode
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      ChallengeParameters:
+                        type: object
+                      AuthenticationResult:
+                        type: object
+                        properties:
+                          AccessToken:
+                            type: string
+                            description: アクセストークン
+                          ExpiresIn:
+                            type: integer
+                            example: 54000 
+                          TokenType:
+                            type: string
+                            example: Bearer 
+                          RefreshToken:
+                            type: string
+                          IdToken:
+                            type: string
+                          accountId:
+                            type: string
+                            format: uuid
+                      ResponseMetadata:
+                        type: object
+                        properties:
+                          RequestId:
+                            type: string
+                            format: uuid
+                          HTTPStatusCode:
+                            type: integer
+                            example: 200 
+                          HTTPHeaders:
+                            type: object
+                            properties:
+                              date:
+                                type: string
+                                example: Thu, 03 Jul 2025 02:39:17 GMT
+                              content-type:
+                                type: string
+                                example: application/x-amz-json-1.1
+                              content-length:
+                                type: integer
+                                example: 4039 
+                              connection:
+                                type: string
+                                example: keep-alive 
+                              x-amzn-requestid:
+                                type: string
+                                format: uuid
+                          RetryAttempts:
+                            type: integer
+                            example: 0
+                      CookieData:
+                        type: object
+                        properties:
+                          statement:
+                            type: string
+                          sign:
+                            type: string
+                      CorpID:
+                        type: integer
+                        description: 法人ID
+                      FacilityID:
+                        type: string
+                        description: 施設ID
+                      FacilityName:
+                        type: string
+                        description: 施設名
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /smartphoneapp/resetpassword:
+    post:
+      tags:
+        - resetpwdreq
+      summary: 【054.ReqResetPwdSmphApp】
+      operationId: request_reset_password_smartphone
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ID:
+                  type: string
+                  description: ログインアカウント
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /smartphoneapp/logout:
+    post:
+      tags:
+        - logout
+      summary: 【055.LogoutSmphApp】
+      operationId: logout_smartphone
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ログアウト成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /gateway/sending:
+    post:
+      tags:
+        - sending
+      summary: 【056.PeriodicSendingGtw】
+      operationId: periodic_sending_gateway
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GatewayID:
+                  type: string
+                  description: ゲートウェイID
+                PeriodicDataList:
+                  type: array
+                  items:
+                    type: object
+                    description: 定時送信データ
+                    title: 定時送信データ
+                    properties:
+                      sensor_id:
+                        type: string
+                        example: CB0013
+                        description: センサー番号（6桁英数字）
+                      command:
+                        type: string
+                        example: 0x18
+                        description: コマンド番号（4桁英数字、"0x18"固定）
+                      timestamp:
+                        type: string
+                        example: 202506171230
+                        description: タイムスタンプ（12桁数字、YYYYMMDDHHMN）
+                      payload:
+                        type: object
+                        properties:
+                          status: 
+                            type: string
+                            example: G
+                            description: 状態：例 G/O/M
+                          heart_rate_avg:
+                            type: string
+                            example: 072
+                            description: 心拍（3桁数字、または "-"）
+                          resp_rate_avg:
+                            type: string
+                            example: ー
+                            description: 呼吸（3桁数字、または "-"）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                  type: object
+                  properties:
+                    time:
+                      type: string
+                      format: date-time
+                    SensorsList:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          sensor_id:
+                            type: string
+                            example: CB0013
+                            description: センサー番号（6桁英数字）
+                          config_update:
+                            type: boolean
+                            description: 設定値の変更がなかった場合、false
+                          wakeup_alert:
+                            type: object
+                            properties:
+                              enabled:
+                                type: boolean
+                                description: true:ON,false:OFF
+                              judge_time:
+                                type: string
+                                example: 07:30
+                          getout_bed_alert:
+                            type: object
+                            properties:
+                              enabled:
+                                type: boolean
+                                description: true:ON,false:OFF
+                              start_time:
+                                type: string
+                                example: 22:00
+                              end_time:
+                                type: string
+                                example: 06:00
+                              judge_duration:
+                                type: string
+                                example: 005
+                          bedin_alert:
+                            type: object
+                            properties:
+                              enabled:
+                                  type: boolean
+                                  description: true:ON,false:OFF
+                              start_time:
+                                  type: string
+                                  example: 21:00
+                              end_time:
+                                  type: string
+                                  example: 23:00
+                              judge_duration:
+                                  type: string
+                                  example: 010
+                          heart_rate_alert:
+                            type: object
+                            properties:
+                              low_limit:
+                                  type: string
+                                  example: 040
+                              high_limit:
+                                  type: string
+                                  example: 100
+                              duration:
+                                  type: string
+                                  example: 010
+                          breathing_alert:
+                            type: object
+                            properties:
+                              low_limit:
+                                  type: string
+                                  example: 010
+                              high_limit:
+                                  type: string
+                                  example: 030
+                              duration:
+                                  type: string
+                                  example: 010
+                          sensor_sensitivity:
+                            type: integer
+                            minimum: 1
+                            maximum: 3
+                            description: 1:AUTO,2:LOW,3:HIGH（項目マスタより）
+                          getout_bed_judge_level:
+                            type: integer
+                            minimum: 1
+                            maximum: 3
+                            description: 1:AUTO,2:LOW,3:HIGH（項目マスタより）
+                          bedin_judge_level:
+                            type: integer
+                            minimum: 1
+                            maximum: 3
+                            description: 1:AUTO,2:LOW,3:HIGH（項目マスタより）
+                          alert_clear_button:
+                            type: boolean
+                            example: true:ON,false:OFF
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /gateway/sending/instant:
+    post:
+      tags:
+        - sending
+      summary: 【057.InstantSendingGtw】
+      operationId: instant_sending_gateway
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: アラート即時送信
+              title: アラート即時送信
+              properties:
+                sensor_id:
+                  type: string
+                  example: CB0013
+                  description: センサー番号（6桁英数字）
+                command:
+                  type: string
+                  example: 0xE1
+                  description: コマンド番号（4桁英数字、内容は”NJI（ラズパイ）向け通信仕様書”のコマンド一覧に準ずる）
+                timestamp:
+                  type: string
+                  example: 20250617153045
+                  description: タイムスタンプ（14桁数字、YYYYMMDDHHMNSS）
+                status: 
+                  type: string
+                  example: 発報
+                  description: 状態：例 "発報"/"解除"
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /gateway/updates:
+    post:
+      tags:
+        - checkupdates
+      summary: 【058.CheckAppUpdatesGtw】
+      operationId: check_application_updates_gateway
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: 初回起動時にサーバへ登録する情報
+              title: 初回起動時にサーバへ登録する情報
+              properties:
+                GatewayID:
+                  type: string
+                  description: 初回起動後のサーバ登録用接続時はnull
+                GatewayName:
+                  type: string
+                  description: モニタアプリで表示される『ホスト名』
+                Version:
+                  type: string
+                  description: ゲートウェイ機器のバージョン
+                MachineType:
+                  type: string
+                  description: モニタアプリで表示される『機器タイプ』
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  GatewayID:
+                    type: string
+                    description: サーバから払い出された、機器識別用固有ID
+                  UpdateNecessity:
+                    type: boolean
+                    description: アップデートの有無（true:あり/false:なし）
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /gateway/updates/checksensor:
+    post:
+      tags:
+        - checkupdates
+      summary: 【059.CheckSensorUpdatesGtw】
+      operationId: check_sensor_updates_gateway
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                DeviceID:
+                  type: array
+                  items:
+                    type: string
+                    description: デバイスID（デバイステーブルの主キーと一致）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  DataList:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        DeviceID:
+                          type: string
+                          description: デバイスID（デバイステーブルの主キーと一致）
+                        UpdateNecessity:
+                          type: boolean
+                          description: アップデートの有無（true:あり/false:なし）
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /smartphoneapp/pushnotifkey:
+    post:
+      tags:
+        - pushnotifkey
+      summary: 【060.AddPushNotifKeySmphApp】
+      operationId: add_notification_key_smartphone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ID:
+                  type: string
+                  description: スマホアプリID
+                PushKey:
+                  type: string
+                  description: プッシュ通知受信用の端末固有キー
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    delete:
+      tags:
+        - pushnotifkey
+      summary: 【061.DelPushNotifKeySmphApp】
+      operationId: delete_notification_key_smartphone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ID:
+                  type: string
+                  description: スマホアプリID
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /systemmanage/deviceregisterfile:
+    get:
+      tags:
+        - device
+      summary: 【066.GetDeviceRegisterFileSysMng】
+      operationId: get_device_register_csv_manage
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      DataCSV:
+                        type: string
+                        example: "デバイスID,種類（安心ひつじα／AISH）"
+                        description: デバイス一括登録用フォーマット
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /smartphoneapp/notifgroup:
+    put:
+      tags:
+        - notifgroup
+      summary: 【067.EditNotifGroupSmphApp】
+      operationId: edit_notification_group_smartphone
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                GroupNumber:
+                  type: integer
+                  minimum: 1
+                  maximum: 8
+                  description: グループID
+                Status:
+                  type: boolean
+                  description: アラート通知の受信設定（true:ON/false:OFF）
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse200'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    get:
+      tags:
+        - notifgroup
+      summary: 【068.GetNotifGroupSmphApp】
+      operationId: get_notification_group_smartphone
+      parameters:
+        - in: header
+          name: AccessToken
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralResponse200'
+                  - type: object
+                    properties:
+                      Group1:
+                        type: boolean
+                        description: グループID=1の受信設定（true:ON/false:OFF）
+                      Group2:
+                        type: boolean
+                        description: グループID=2の受信設定（true:ON/false:OFF）
+                      Group3:
+                        type: boolean
+                        description: グループID=3の受信設定（true:ON/false:OFF）
+                      Group4:
+                        type: boolean
+                        description: グループID=4の受信設定（true:ON/false:OFF）
+                      Group5:
+                        type: boolean
+                        description: グループID=5の受信設定（true:ON/false:OFF）
+                      Group6:
+                        type: boolean
+                        description: グループID=6の受信設定（true:ON/false:OFF）
+                      Group7:
+                        type: boolean
+                        description: グループID=7の受信設定（true:ON/false:OFF）
+                      Group8:
+                        type: boolean
+                        description: グループID=8の受信設定（true:ON/false:OFF）
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '401':
+          description: Authetication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: System error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralError'
