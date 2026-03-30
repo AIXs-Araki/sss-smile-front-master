@@ -1,0 +1,204 @@
+/* -------------------------------------
+ *	common > mixins css
+ * ------------------------------------- */
+zero()
+	margin 0px
+	padding 0px
+.sans-serif
+	font-family -apple-system, 'Source Sans Pro', helvetica, meiryo, sans-serif
+
+/* -------------------------------------
+ *	common css
+ * ------------------------------------- */
+html
+	display block
+	height 100%
+	// background-color rgb(12,27,58)
+	// background-color rgb(255,255,255)
+	background-color rgb(0,0,0)
+	position relative
+	zero()
+	overflow hidden
+body
+	display block
+	height 100%
+	position relative
+	zero()
+	font-family 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'メイリオ', meiryo, Verdana, "lr oSVbN"
+	line-height 1.75
+	color #f5f6f7
+	-webkit-text-size-adjust none
+	-webkit-font-smoothing antialiased
+	font-smoothing antialiased
+	text-size-adjust none
+	overflow hidden
+	&.lockScroll
+		overflow hidden
+::selection
+	background rgba(22,160,133,.2)
+
+#niceBody
+	display block
+	-webkit-user-select none
+#niceBody.android
+	-webkit-user-select none
+
+/* 段落タグ ---------------------------- */
+p
+	margin 0em 0em 1.75em 0em
+	padding 0em 0em 0em 0em
+
+
+/* リストタグ -------------------------- */
+ul
+li
+ol
+	list-style none
+
+/* インプットタグ -------------------------- */
+button:focus
+	outline none
+*
+	outline: none;
+	-webkit-tap-highlight-color rgba(0, 0, 0, 0)
+	-webkit-tap-highlight-color transparent
+	&:active
+	&:focus
+		-webkit-tap-highlight-color rgba(0, 0, 0, 0)!important
+		-webkit-focus-ring-color rgba(0, 0, 0, 0)!important
+		outline: none!important
+
+/* リンクタグ -------------------------- */
+a
+	&:link
+	&:visited
+	&:active
+	&:hover
+		border none
+		text-decoration none
+		color #333
+
+/* イメージタグ ------------------------ */
+img
+	zero()
+	border none
+	line-height 100%
+
+/* padding -------------------------- */
+paddingSet(val)
+	padding 0px val 0px val
+	cursor default
+
+.padding6
+	paddingSet(6px)
+.padding8
+	paddingSet(8px)
+.padding12
+	paddingSet(12px)
+.padding18
+	paddingSet(18px)
+
+/* and others -------------------------- */
+.none
+	display none
+.hidden
+	visibility hidden
+.nomargin
+	zero()
+.left
+	float left
+.right
+	float right
+.text-left
+	text-align left
+.text-center
+	text-align center
+.text-right
+	text-align right
+
+
+/* -------------------------------------
+ *	media query css
+ * ------------------------------------- */
+@media screen and (max-width 768px)
+	.xs-hide
+		display none !important
+@media screen and (min-width 768px)
+	.xs-show
+		display none !important
+@media screen and (max-width 992px)
+	.sm-hide
+		display none !important
+@media screen and (min-width 992px)
+	.sm-show
+		display none !important
+@media screen and (max-width 1290px)
+	.md-hide
+		display none !important
+@media screen and (min-width 1290px)
+	.md-show
+		display none !important
+@media screen and (max-width 1600px)
+	.lg-show
+		display none !important
+@media screen and (min-width 1600px)
+	.lg-hide
+		display none !important
+
+/* -------------------------------------
+ *	custom element ui
+ * ------------------------------------- */
+/* NOTIFICATION -------------------------- */
+.el-notification
+.el-message
+.el-dialog__wrapper
+	z-index 3311 !important
+	.el-dialog__headerbtn
+		float inherit
+		position absolute
+		right 16px
+		margin-top -5px
+		margin-right -5px
+		padding 10px
+		border none
+.el-notification
+	width calc(100% - 32px) !important
+	.el-notification__icon
+		color rgb(9,109,242) !important
+		&.el-icon-success
+			color #333 !important
+		&.el-icon-error
+			color #e74c3c !important
+		&.el-icon-circle-cross
+			color #ff4949 !important
+	&.busy
+		.el-notification__icon
+			color rgb(247,186,42) !important
+	&.warning-notification
+		.el-notification__icon
+			color #f39c12 !important
+	h2
+		margin-bottom 5px !important
+	.el-notification__content
+		margin 0 !important
+		text-align left !important
+		p
+			margin 0 !important
+	.el-notification__closeBtn
+		top 0px
+		right 0px
+		padding 20px
+		font-size 24px
+.v-modal
+	// display none
+	background rgba(13,15,37,.666) !important
+	opacity 1 !important
+	z-index 3310 !important
+/* DIALOG -------------------------- */
+.el-dialog__wrapper
+	-webkit-overflow-scrolling touch
+	// .el-dialog
+	// 	top 46px !important
+/* -------------------------------------
+ *	popover
+ * ------------------------------------- */
